@@ -56,8 +56,8 @@ export function useZwiftAuth() {
       localStorage.setItem(STORAGE_KEYS.credentials, JSON.stringify(credentials));
       localStorage.setItem(STORAGE_KEYS.athleteId, result.athleteId);
       localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(result.profile));
-      localStorage.setItem(STORAGE_KEYS.xp, result.xp);
-      localStorage.setItem(STORAGE_KEYS.level, result.level);
+      localStorage.setItem(STORAGE_KEYS.xp, String(result.xp || 0));
+      localStorage.setItem(STORAGE_KEYS.level, String(result.level || 0));
       localStorage.setItem(STORAGE_KEYS.lastSynced, new Date().toISOString());
 
       setState((prev) => ({
@@ -100,8 +100,8 @@ export function useZwiftAuth() {
       const now = new Date().toISOString();
 
       // Update stored data
-      localStorage.setItem(STORAGE_KEYS.xp, result.xp);
-      localStorage.setItem(STORAGE_KEYS.level, result.level);
+      localStorage.setItem(STORAGE_KEYS.xp, String(result.xp || 0));
+      localStorage.setItem(STORAGE_KEYS.level, String(result.level || 0));
       localStorage.setItem(STORAGE_KEYS.lastSynced, now);
 
       setState((prev) => ({
