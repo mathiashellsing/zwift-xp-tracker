@@ -2,7 +2,7 @@
     "name": "zwift-xp-tracker",
     "version": "1.0.0",
     "private": true,
-    "homepage": "https://mathiashellsing.github.io/zwift-xp-tracker",
+    "homepage": "/",
     "dependencies": {
         "@codingwithspike/zwift-api-wrapper": "^0.0.9",
         "lucide-react": "^0.263.1",
