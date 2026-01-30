@@ -1,14 +1,12 @@
 /**
  * Netlify Function: POST /.netlify/functions/logout
- * Clear a session
+ * Logout (no-op for stateless architecture)
  * 
- * Request body:
- * {
- *   "sessionId": "abc123"
- * }
+ * Request body: {} (empty, just triggers client-side logout)
+ * 
+ * Note: Since we don't store sessions on the server, logout is just
+ * client-side cleanup. This endpoint exists for consistency.
  */
-
-import { deleteSession } from './utils/sessionStore.js';
 
 export const handler = async (event, context) => {
   // Only allow POST requests
@@ -20,12 +18,6 @@ export const handler = async (event, context) => {
   }
 
   try {
-    const { sessionId } = JSON.parse(event.body || '{}');
-
-    if (sessionId) {
-      deleteSession(sessionId);
-    }
-
     return {
       statusCode: 200,
       body: JSON.stringify({

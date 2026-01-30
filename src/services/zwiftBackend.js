@@ -2,10 +2,11 @@
  * Zwift Backend API Client
  * Communicates with the Netlify Functions backend to authenticate and sync XP
  * 
- * URLs:
- * - Local development: http://localhost:8888/.netlify/functions
- * - Netlify production: https://yourdomain.netlify.app/.netlify/functions
- * - Custom domain: https://your-custom-domain/.netlify/functions
+ * Architecture: Credentials-based (stateless)
+ * - Credentials are stored client-side in localStorage
+ * - Each sync request sends credentials to backend
+ * - Backend re-authenticates on each call (no server sessions)
+ * - More secure than session tokens and works with stateless functions
  */
 
 // Determine API base URL based on environment
@@ -43,6 +44,7 @@ const API_BASE_URL = getAPIBaseUrl();
 
 /**
  * Login to Zwift using backend API
+ * Returns credentials that should be stored client-side
  */
 export async function loginToZwift(email, password) {
   try {
@@ -68,16 +70,17 @@ export async function loginToZwift(email, password) {
 }
 
 /**
- * Sync XP for a session
+ * Sync XP for a user
+ * Requires email and password (stored from login)
  */
-export async function syncXP(sessionId) {
+export async function syncXP(email, password) {
   try {
     const response = await fetch(`${API_BASE_URL}/sync`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ sessionId }),
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
@@ -94,16 +97,16 @@ export async function syncXP(sessionId) {
 }
 
 /**
- * Logout
+ * Logout (client-side cleanup)
  */
-export async function logoutZwift(sessionId) {
+export async function logoutZwift() {
   try {
     const response = await fetch(`${API_BASE_URL}/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ sessionId }),
+      body: JSON.stringify({}),
     });
 
     const data = await response.json();

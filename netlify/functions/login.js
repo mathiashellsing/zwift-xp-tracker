@@ -7,10 +7,13 @@
  *   "email": "user@example.com",
  *   "password": "password"
  * }
+ * 
+ * Note: Credentials are sent to client in response and stored in localStorage.
+ * This is necessary because Netlify Functions are stateless - sessions don't
+ * persist between function invocations.
  */
 
 import { ZwiftAPI } from '@codingwithspike/zwift-api-wrapper';
-import { createSession } from './utils/sessionStore.js';
 
 export const handler = async (event, context) => {
   // Only allow POST requests
@@ -72,14 +75,6 @@ export const handler = async (event, context) => {
     const xp = profile.totalXp || 0;
     const level = profile.level || 0;
 
-    // Create session ID for this authenticated user
-    const sessionId = createSession({
-      api,
-      athleteId,
-      email,
-      profile,
-    });
-
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -94,7 +89,12 @@ export const handler = async (event, context) => {
         },
         xp,
         level,
-        sessionId,
+        // Return credentials for client to use in subsequent requests
+        // These will be stored in localStorage on the client
+        credentials: {
+          email,
+          password,
+        },
       }),
     };
   } catch (error) {

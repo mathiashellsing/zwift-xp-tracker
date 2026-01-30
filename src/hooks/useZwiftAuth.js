@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { loginToZwift, syncXP, logoutZwift } from '../services/zwiftBackend';
 
 const STORAGE_KEYS = {
-  sessionId: 'zwift-session.sessionId',
+  credentials: 'zwift-session.credentials',
   athleteId: 'zwift-session.athleteId',
   profile: 'zwift-session.profile',
   xp: 'zwift-session.xp',
@@ -20,7 +20,7 @@ export function useZwiftAuth() {
     isAuthenticated: false,
     isLoading: false,
     error: null,
-    sessionId: null,
+    credentials: null,
     athleteId: null,
     profile: null,
     xp: null,
@@ -30,12 +30,12 @@ export function useZwiftAuth() {
 
   // Restore session from storage on mount
   useEffect(() => {
-    const sessionId = localStorage.getItem(STORAGE_KEYS.sessionId);
-    if (sessionId) {
+    const storedCredentials = localStorage.getItem(STORAGE_KEYS.credentials);
+    if (storedCredentials) {
       setState((prev) => ({
         ...prev,
         isAuthenticated: true,
-        sessionId,
+        credentials: JSON.parse(storedCredentials),
         athleteId: localStorage.getItem(STORAGE_KEYS.athleteId),
         profile: JSON.parse(localStorage.getItem(STORAGE_KEYS.profile) || 'null'),
         xp: parseInt(localStorage.getItem(STORAGE_KEYS.xp) || '0', 10),
@@ -51,8 +51,9 @@ export function useZwiftAuth() {
     try {
       const result = await loginToZwift(email, password);
 
-      // Store session data
-      localStorage.setItem(STORAGE_KEYS.sessionId, result.sessionId);
+      // Store credentials and user data
+      const credentials = { email, password };
+      localStorage.setItem(STORAGE_KEYS.credentials, JSON.stringify(credentials));
       localStorage.setItem(STORAGE_KEYS.athleteId, result.athleteId);
       localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(result.profile));
       localStorage.setItem(STORAGE_KEYS.xp, result.xp);
@@ -63,7 +64,7 @@ export function useZwiftAuth() {
         ...prev,
         isAuthenticated: true,
         isLoading: false,
-        sessionId: result.sessionId,
+        credentials,
         athleteId: result.athleteId,
         profile: result.profile,
         xp: result.xp,
@@ -83,7 +84,7 @@ export function useZwiftAuth() {
   }, []);
 
   const handleSync = useCallback(async () => {
-    if (!state.sessionId) {
+    if (!state.credentials) {
       setState((prev) => ({
         ...prev,
         error: 'Not authenticated',
@@ -94,7 +95,7 @@ export function useZwiftAuth() {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const result = await syncXP(state.sessionId);
+      const result = await syncXP(state.credentials.email, state.credentials.password);
 
       const now = new Date().toISOString();
 
@@ -120,12 +121,12 @@ export function useZwiftAuth() {
       }));
       throw error;
     }
-  }, [state.sessionId]);
+  }, [state.credentials]);
 
   const handleLogout = useCallback(async () => {
-    if (state.sessionId) {
+    if (state.credentials) {
       try {
-        await logoutZwift(state.sessionId);
+        await logoutZwift();
       } catch (error) {
         console.error('Logout error:', error);
       }
@@ -140,14 +141,14 @@ export function useZwiftAuth() {
       isAuthenticated: false,
       isLoading: false,
       error: null,
-      sessionId: null,
+      credentials: null,
       athleteId: null,
       profile: null,
       xp: null,
       level: null,
       lastSynced: null,
     });
-  }, [state.sessionId]);
+  }, [state.credentials]);
 
   return {
     ...state,

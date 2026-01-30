@@ -1,14 +1,18 @@
 /**
  * Netlify Function: POST /.netlify/functions/sync
- * Sync XP for an authenticated session
+ * Sync XP for authenticated user
  * 
  * Request body:
  * {
- *   "sessionId": "abc123"
+ *   "email": "user@example.com",
+ *   "password": "password"
  * }
+ * 
+ * Note: We re-authenticate on each sync because Netlify Functions are stateless.
+ * This is safer anyway - credentials are always fresh and validated.
  */
 
-import { getSession } from './utils/sessionStore.js';
+import { ZwiftAPI } from '@codingwithspike/zwift-api-wrapper';
 
 export const handler = async (event, context) => {
   // Only allow POST requests
@@ -20,20 +24,33 @@ export const handler = async (event, context) => {
   }
 
   try {
-    const { sessionId } = JSON.parse(event.body || '{}');
+    const { email, password } = JSON.parse(event.body || '{}');
 
-    if (!sessionId || !getSession(sessionId)) {
+    if (!email || !password) {
       return {
-        statusCode: 401,
+        statusCode: 400,
         body: JSON.stringify({
           success: false,
-          error: 'Invalid or expired session',
+          error: 'Email and password are required',
         }),
       };
     }
 
-    const session = getSession(sessionId);
-    const { api } = session;
+    // Authenticate with Zwift
+    const api = new ZwiftAPI(email, password);
+
+    try {
+      await api.authenticate();
+    } catch (authError) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({
+          success: false,
+          error: 'Invalid Zwift credentials',
+          details: authError.message,
+        }),
+      };
+    }
 
     // Get updated profile
     let profile;
@@ -44,7 +61,7 @@ export const handler = async (event, context) => {
         statusCode: 401,
         body: JSON.stringify({
           success: false,
-          error: 'Session expired or invalid',
+          error: 'Failed to fetch profile',
           details: error.message,
         }),
       };
