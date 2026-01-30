@@ -53,78 +53,65 @@ export const handler = async (event, context) => {
       };
     }
 
-    // Get user profile
-    let profile;
-    let athleteId;
+    let profileResponse;
     let profileError = null;
+    let profile = null;
+    let athleteId = null;
 
     try {
-      profile = await api.getProfile();
-      athleteId = profile.id;
+      // Try calling /api/profiles/me to get current user profile
+      profileResponse = await api.fetchJSON('/api/profiles/me');
+      console.log('[LOGIN] /api/profiles/me statusCode:', profileResponse?.statusCode);
+      
+      if (profileResponse?.statusCode === 200 && profileResponse?.body) {
+        profile = profileResponse.body;
+        athleteId = profile.id;
+        console.log('[LOGIN] Got athlete ID:', athleteId);
+      }
     } catch (error) {
       profileError = error;
-      console.error('[LOGIN] Profile fetch error:', error.message, error);
+      console.error('[LOGIN] Profile fetch error:', error.message);
     }
 
-    // DEBUG: Log what we got from the API
-    if (profileError) {
-      console.log('[LOGIN] Profile fetch failed, returning error');
+    // If we still don't have the athlete ID, return an error
+    if (!athleteId || !profile) {
+      console.error('[LOGIN] Could not fetch athlete profile');
       return {
         statusCode: 500,
         body: JSON.stringify({
           success: false,
-          error: 'Failed to fetch profile',
-          details: profileError.message,
+          error: 'Failed to fetch athlete profile',
+          details: 'Could not determine athlete ID',
         }),
       };
     }
 
-    // DEBUG: Log the profile structure
-    console.log('[LOGIN] Profile object type:', typeof profile);
-    console.log('[LOGIN] Profile is null/undefined:', profile === null || profile === undefined);
-    if (profile) {
-      try {
-        console.log('[LOGIN] Profile keys:', Object.keys(profile));
-        console.log('[LOGIN] profile.totalXp:', profile.totalXp);
-        console.log('[LOGIN] profile.xp:', profile.xp);
-        console.log('[LOGIN] profile.experience:', profile.experience);
-        console.log('[LOGIN] profile.level:', profile.level);
-        console.log('[LOGIN] JSON stringified profile:', JSON.stringify(profile, null, 2));
-      } catch (logError) {
-        console.error('[LOGIN] Error logging profile:', logError.message);
-      }
-    }
-
-    // Extract XP and level from profile - try multiple field names
+    // Extract XP and level from profile using correct Zwift field names
     let xp = 0;
     let level = 0;
 
     if (profile) {
-      xp = profile.totalXp || profile.xp || profile.experience || 0;
-      level = profile.level || 0;
+      // Zwift uses "totalExperiencePoints" for cycling XP and "achievementLevel" for level
+      xp = profile.totalExperiencePoints || 0;
+      level = profile.achievementLevel || 0;
+      console.log('[LOGIN] Extracted XP:', xp, 'Level:', level);
     }
 
-    console.log('[LOGIN] Extracted XP:', xp, 'Level:', level);
-
-    // IMPORTANT: Return the full profile object for debugging
-    // This will help us understand what fields are actually available from Zwift
+    // Return response with profile data and credentials
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
         athleteId,
-        profile: {
+        profile: profile ? {
           id: profile.id,
           firstName: profile.firstName,
           lastName: profile.lastName,
           email: profile.email,
           countryAlpha3: profile.countryAlpha3,
-        },
+        } : null,
         xp,
         level,
-        // Return full profile object for debugging
-        _debugProfile: profile,
-        _debugProfileKeys: Object.keys(profile),
         // Return credentials for client to use in subsequent requests
         // These will be stored in localStorage on the client
         credentials: {
