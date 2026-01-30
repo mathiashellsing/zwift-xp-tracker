@@ -15,18 +15,28 @@ const getAPIBaseUrl = () => {
     return process.env.REACT_APP_API_URL;
   }
 
+  // Check current hostname
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+
+  // Local development with Netlify CLI (localhost:8888)
+  if (hostname === 'localhost' && port === '8888') {
+    return '/.netlify/functions';
+  }
+
+  // Local development with Create React App dev server (localhost:3000)
+  if (hostname === 'localhost' && port === '3000') {
+    return 'http://localhost:3001/api'; // Old Express backend fallback
+  }
+
   // Running on Netlify (production or preview)
-  if (process.env.REACT_APP_NETLIFY === 'true') {
+  // Netlify domains: *.netlify.app, or custom domains
+  if (hostname.includes('netlify.app') || hostname.includes('zwiftxptracker')) {
     return '/.netlify/functions';
   }
 
-  // Local development with Netlify CLI
-  if (window.location.hostname === 'localhost' && window.location.port === '8888') {
-    return '/.netlify/functions';
-  }
-
-  // Fallback to old Express backend for backward compatibility
-  return 'http://localhost:3001/api';
+  // Default to relative path (works for same-origin)
+  return '/.netlify/functions';
 };
 
 const API_BASE_URL = getAPIBaseUrl();
