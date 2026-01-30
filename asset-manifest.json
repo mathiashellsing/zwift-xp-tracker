@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/zwift-xp-tracker/static/js/main.05c774e5.js",
+    "main.js": "/zwift-xp-tracker/static/js/main.2cfd71ed.js",
     "index.html": "/zwift-xp-tracker/index.html",
-    "main.05c774e5.js.map": "/zwift-xp-tracker/static/js/main.05c774e5.js.map"
+    "main.2cfd71ed.js.map": "/zwift-xp-tracker/static/js/main.2cfd71ed.js.map"
   },
   "entrypoints": [
-    "static/js/main.05c774e5.js"
+    "static/js/main.2cfd71ed.js"
   ]
 }
