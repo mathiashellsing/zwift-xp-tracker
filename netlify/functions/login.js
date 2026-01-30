@@ -100,6 +100,8 @@ export const handler = async (event, context) => {
         },
         xp,
         level,
+        // DEBUG: Return full profile for inspection
+        _debugFullProfile: profile,
         // Return credentials for client to use in subsequent requests
         // These will be stored in localStorage on the client
         credentials: {
