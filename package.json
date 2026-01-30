@@ -2,7 +2,7 @@
     "name": "zwift-xp-tracker",
     "version": "1.0.0",
     "private": true,
-    "homepage": "https://YOUR_GITHUB_USERNAME.github.io/zwift-xp-tracker",
+    "homepage": "https://mathiashellsing.github.io/zwift-xp-tracker",
     "dependencies": {
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
