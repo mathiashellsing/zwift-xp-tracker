@@ -1,0 +1,37 @@
+# Netlify Configuration for Zwift XP Tracker
+
+[build]
+  command = "npm run build"
+  functions = "netlify/functions"
+  publish = "build"
+
+# Redirect API calls to Netlify Functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  
+# Redirect for SPA (single page app)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Environment variables
+[env]
+  [env.development]
+    # Local development uses http://localhost:8888
+  [env.production]
+    # Production uses https://yourdomain.netlify.app
+
+# Function configuration
+[functions]
+  node_bundler = "esbuild"
+
+# Headers for API endpoints
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    "Access-Control-Allow-Origin" = "*"
+    "Access-Control-Allow-Methods" = "GET, POST, PUT, DELETE, OPTIONS"
+    "Access-Control-Allow-Headers" = "Content-Type"

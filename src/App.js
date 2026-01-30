@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Trophy, Lock, Unlock, TrendingUp, Eye, X } from 'lucide-react';
 import IMAGE_MAP from './imageMap';
+import { ZwiftLogin } from './components/ZwiftLogin';
+import { useZwiftAuth } from './hooks/useZwiftAuth';
 
 const PUBLIC_BASE_URL = process.env.PUBLIC_URL || '';
 const STORAGE_KEYS = {
@@ -132,17 +134,26 @@ const UNLOCKABLES = [
 ];
 
 export default function App() {
-    const [currentXP, setCurrentXP] = useState(() => readStoredNumber(STORAGE_KEYS.currentXP, 50000));
     const [inputXP, setInputXP] = useState(() => String(readStoredNumber(STORAGE_KEYS.currentXP, 50000)));
     const [filter, setFilter] = useState(() => readStoredString(STORAGE_KEYS.filter, 'all'));
     const [selectedItem, setSelectedItem] = useState(null);
     const [viewMode, setViewMode] = useState(() => readStoredString(STORAGE_KEYS.viewMode, 'list'));
+    
+    // Use Zwift authentication
+    const zwiftAuth = useZwiftAuth();
+    
+    // Use Zwift XP if authenticated, otherwise use manual input
+    const currentXP = zwiftAuth.xp !== null ? zwiftAuth.xp : readStoredNumber(STORAGE_KEYS.currentXP, 50000);
+
 
     useEffect(() => {
         try {
-            window.localStorage.setItem(STORAGE_KEYS.currentXP, String(currentXP));
+            if (zwiftAuth.xp === null) {
+                // Only store inputXP if not using Zwift auth
+                window.localStorage.setItem(STORAGE_KEYS.currentXP, inputXP);
+            }
         } catch {}
-    }, [currentXP]);
+    }, [inputXP, zwiftAuth.xp]);
 
     useEffect(() => {
         try {
@@ -202,7 +213,9 @@ export default function App() {
 
     const handleUpdateXP = () => {
         const xp = parseInt(inputXP) || 0;
-        setCurrentXP(xp);
+        window.localStorage.setItem(STORAGE_KEYS.currentXP, String(xp));
+        // Reload to update currentXP from localStorage
+        window.location.reload();
     };
 
     const filteredItems = useMemo(() => {
@@ -218,6 +231,18 @@ export default function App() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 p-4">
             <div className="max-w-6xl mx-auto">
+                {/* Zwift Login Section */}
+                <ZwiftLogin
+                    isAuthenticated={zwiftAuth.isAuthenticated}
+                    profile={zwiftAuth.profile}
+                    isLoading={zwiftAuth.isLoading}
+                    error={zwiftAuth.error}
+                    onLogin={zwiftAuth.login}
+                    onSync={zwiftAuth.sync}
+                    onLogout={zwiftAuth.logout}
+                    lastSynced={zwiftAuth.lastSynced}
+                />
+
                 {/* Header */}
                 <div className="bg-white rounded-lg shadow-xl p-6 mb-6">
                     <div className="flex items-center gap-3 mb-4">
@@ -225,22 +250,24 @@ export default function App() {
                         <h1 className="text-3xl font-bold text-gray-800">Zwift XP Tracker</h1>
                     </div>
 
-                    {/* XP Input */}
-                    <div className="flex gap-3 mb-6">
-                        <input
-                            type="number"
-                            value={inputXP}
-                            onChange={(e) => setInputXP(e.target.value)}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                            placeholder="Enter your XP"
-                        />
-                        <button
-                            onClick={handleUpdateXP}
-                            className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold"
-                        >
-                            Update
-                        </button>
-                    </div>
+                    {/* XP Input - Manual or Zwift */}
+                    {!zwiftAuth.isAuthenticated && (
+                        <div className="flex gap-3 mb-6">
+                            <input
+                                type="number"
+                                value={inputXP}
+                                onChange={(e) => setInputXP(e.target.value)}
+                                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                placeholder="Enter your XP"
+                            />
+                            <button
+                                onClick={handleUpdateXP}
+                                className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold"
+                            >
+                                Update
+                            </button>
+                        </div>
+                    )}
 
                     {/* Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
