@@ -60,6 +60,15 @@ export const handler = async (event, context) => {
     try {
       profile = await api.getProfile();
       athleteId = profile.id;
+      
+      // DEBUG: Log the entire profile object to understand its structure
+      console.log('[LOGIN] Full profile object:', JSON.stringify(profile, null, 2));
+      console.log('[LOGIN] Profile keys:', Object.keys(profile));
+      console.log('[LOGIN] profile.totalXp:', profile.totalXp);
+      console.log('[LOGIN] profile.level:', profile.level);
+      console.log('[LOGIN] profile.xp:', profile.xp);
+      console.log('[LOGIN] profile.progression:', profile.progression);
+      console.log('[LOGIN] profile.playerStats:', profile.playerStats);
     } catch (profileError) {
       return {
         statusCode: 500,
@@ -74,6 +83,8 @@ export const handler = async (event, context) => {
     // Extract XP and level from profile
     const xp = profile.totalXp || 0;
     const level = profile.level || 0;
+    
+    console.log('[LOGIN] Extracted XP:', xp, 'Level:', level);
 
     return {
       statusCode: 200,
