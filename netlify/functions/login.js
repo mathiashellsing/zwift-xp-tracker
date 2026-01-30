@@ -56,20 +56,19 @@ export const handler = async (event, context) => {
     // Get user profile
     let profile;
     let athleteId;
+    let profileError = null;
 
     try {
       profile = await api.getProfile();
       athleteId = profile.id;
-      
-      // DEBUG: Log the entire profile object to understand its structure
-      console.log('[LOGIN] Full profile object:', JSON.stringify(profile, null, 2));
-      console.log('[LOGIN] Profile keys:', Object.keys(profile));
-      console.log('[LOGIN] profile.totalXp:', profile.totalXp);
-      console.log('[LOGIN] profile.level:', profile.level);
-      console.log('[LOGIN] profile.xp:', profile.xp);
-      console.log('[LOGIN] profile.progression:', profile.progression);
-      console.log('[LOGIN] profile.playerStats:', profile.playerStats);
-    } catch (profileError) {
+    } catch (error) {
+      profileError = error;
+      console.error('[LOGIN] Profile fetch error:', error.message, error);
+    }
+
+    // DEBUG: Log what we got from the API
+    if (profileError) {
+      console.log('[LOGIN] Profile fetch failed, returning error');
       return {
         statusCode: 500,
         body: JSON.stringify({
@@ -80,12 +79,35 @@ export const handler = async (event, context) => {
       };
     }
 
-    // Extract XP and level from profile
-    const xp = profile.totalXp || 0;
-    const level = profile.level || 0;
-    
+    // DEBUG: Log the profile structure
+    console.log('[LOGIN] Profile object type:', typeof profile);
+    console.log('[LOGIN] Profile is null/undefined:', profile === null || profile === undefined);
+    if (profile) {
+      try {
+        console.log('[LOGIN] Profile keys:', Object.keys(profile));
+        console.log('[LOGIN] profile.totalXp:', profile.totalXp);
+        console.log('[LOGIN] profile.xp:', profile.xp);
+        console.log('[LOGIN] profile.experience:', profile.experience);
+        console.log('[LOGIN] profile.level:', profile.level);
+        console.log('[LOGIN] JSON stringified profile:', JSON.stringify(profile, null, 2));
+      } catch (logError) {
+        console.error('[LOGIN] Error logging profile:', logError.message);
+      }
+    }
+
+    // Extract XP and level from profile - try multiple field names
+    let xp = 0;
+    let level = 0;
+
+    if (profile) {
+      xp = profile.totalXp || profile.xp || profile.experience || 0;
+      level = profile.level || 0;
+    }
+
     console.log('[LOGIN] Extracted XP:', xp, 'Level:', level);
 
+    // IMPORTANT: Return the full profile object for debugging
+    // This will help us understand what fields are actually available from Zwift
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -100,8 +122,9 @@ export const handler = async (event, context) => {
         },
         xp,
         level,
-        // DEBUG: Return full profile for inspection
-        _debugFullProfile: profile,
+        // Return full profile object for debugging
+        _debugProfile: profile,
+        _debugProfileKeys: Object.keys(profile),
         // Return credentials for client to use in subsequent requests
         // These will be stored in localStorage on the client
         credentials: {
