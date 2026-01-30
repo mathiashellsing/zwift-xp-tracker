@@ -191,6 +191,15 @@ export default function App() {
         return { unlocked, locked, nextUnlock, progress };
     }, [currentXP]);
 
+    const nextUnlockProgress = useMemo(() => {
+        if (!stats.nextUnlock) return null;
+        const lastUnlockedXP = stats.unlocked.length > 0 ? stats.unlocked[stats.unlocked.length - 1].xp : 0;
+        const span = Math.max(1, stats.nextUnlock.xp - lastUnlockedXP);
+        const earned = Math.max(0, currentXP - lastUnlockedXP);
+        const pct = Math.min(100, (earned / span) * 100);
+        return { lastUnlockedXP, span, earned, pct };
+    }, [stats, currentXP]);
+
     const handleUpdateXP = () => {
         const xp = parseInt(inputXP) || 0;
         setCurrentXP(xp);
@@ -264,27 +273,39 @@ export default function App() {
                     </div>
 
                     {/* Next Unlock */}
-                    {stats.nextUnlock && (
-                        <div className="mt-6 bg-gradient-to-r from-yellow-50 via-orange-50 to-orange-100 border-2 border-orange-300 rounded-xl shadow-md p-5">
-                            <div className="flex items-center gap-3 mb-3">
-                                <TrendingUp className="w-6 h-6 text-orange-600" />
-                                <h2 className="text-lg font-bold text-gray-800">Next Unlock</h2>
-                                <span className="ml-auto text-sm font-semibold text-orange-700 bg-orange-100 px-3 py-1 rounded-full">
+                    {stats.nextUnlock && nextUnlockProgress && (
+                        <div className="mt-6 bg-gradient-to-r from-yellow-50 via-orange-50 to-orange-100 border-2 border-orange-300 rounded-2xl shadow-lg p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <TrendingUp className="w-7 h-7 text-orange-600" />
+                                <h2 className="text-xl font-bold text-gray-800">Next Unlock</h2>
+                                <span className="ml-auto text-sm font-semibold text-orange-700 bg-orange-100 px-4 py-1.5 rounded-full">
                                     {(stats.nextUnlock.xp - currentXP).toLocaleString()} XP to go
                                 </span>
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-5">
                                 <img
                                     src={getItemImage(stats.nextUnlock)}
                                     alt={stats.nextUnlock.name}
-                                    className="w-20 h-20 rounded-xl object-cover border-2 border-orange-200 shadow-sm"
+                                    className="w-40 h-40 md:w-56 md:h-56 rounded-3xl object-cover border-2 border-orange-200 shadow-md"
                                 />
-                                <div>
-                                    <div className="text-xl font-semibold text-gray-800">{stats.nextUnlock.name}</div>
+                                <div className="flex-1">
+                                    <div className="text-2xl font-semibold text-gray-800">{stats.nextUnlock.name}</div>
                                     <div className="text-sm text-gray-600">{stats.nextUnlock.category}</div>
                                     <div className="text-sm font-semibold text-gray-700 mt-1">
                                         {stats.nextUnlock.xp.toLocaleString()} XP required
                                     </div>
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                <div className="flex justify-between text-xs text-gray-600 mb-1">
+                                    <span>{nextUnlockProgress.earned.toLocaleString()} XP into this level</span>
+                                    <span>{nextUnlockProgress.span.toLocaleString()} XP total</span>
+                                </div>
+                                <div className="h-3 md:h-4 bg-orange-200/60 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-500"
+                                        style={{ width: `${nextUnlockProgress.pct}%` }}
+                                    />
                                 </div>
                             </div>
                         </div>
