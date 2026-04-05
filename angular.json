@@ -22,16 +22,14 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              {
-                "glob": "**/*",
-                "input": "public/unlockables",
-                "output": "unlockables"
               }
             ],
             "styles": [
               "src/styles.css"
-            ]
+            ],
+            "outputPath": "dist/zwift-xp-tracker",
+            "prerender": false,
+            "ssr": false
           },
           "configurations": {
             "production": {
