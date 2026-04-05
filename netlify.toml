@@ -27,6 +27,7 @@
 # Function configuration
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["@codingwithspike/zwift-api-wrapper"]
 
 # Headers for API endpoints
 [[headers]]
