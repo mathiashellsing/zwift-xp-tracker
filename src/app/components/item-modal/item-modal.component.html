@@ -1,10 +1,11 @@
 <div
-  class="modal-backdrop fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+  class="fixed inset-0 bg-black/70 backdrop-blur-xl flex items-end sm:items-center justify-center z-50 p-4"
   (click)="onBackdropClick($event)"
 >
-  <div class="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+  <div class="glass rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden">
+
     <!-- Image -->
-    <div class="relative bg-gray-700 h-56 flex items-center justify-center">
+    <div class="relative bg-white/5 h-52 flex items-center justify-center overflow-hidden">
       <img
         *ngIf="item.imageUrl"
         [src]="item.imageUrl"
@@ -12,62 +13,72 @@
         class="h-full w-full object-cover"
         (error)="$any($event.target).style.display='none'"
       />
-      <div *ngIf="!item.imageUrl" class="text-6xl text-gray-500">
-        <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-        </svg>
-      </div>
+      <svg *ngIf="!item.imageUrl" class="w-14 h-14 text-white/10" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+      </svg>
 
-      <!-- Status badge -->
-      <div class="absolute top-3 right-3">
-        <span
-          *ngIf="item.unlocked"
-          class="px-3 py-1 bg-green-500 text-white text-xs font-bold rounded-full shadow"
-        >UNLOCKED</span>
-        <span
-          *ngIf="!item.unlocked"
-          class="px-3 py-1 bg-gray-600 text-gray-300 text-xs font-bold rounded-full shadow"
-        >LOCKED</span>
-      </div>
+      <!-- Locked overlay -->
+      <div *ngIf="!item.unlocked" class="absolute inset-0 bg-black/40"></div>
 
-      <!-- Close button -->
+      <!-- Close -->
       <button
         (click)="close.emit()"
-        class="absolute top-3 left-3 w-8 h-8 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition"
+        class="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center text-white/70 hover:text-white transition border border-white/10"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
       </button>
+
+      <!-- Status pill -->
+      <div class="absolute bottom-3 left-3">
+        <span
+          *ngIf="item.unlocked"
+          class="px-2.5 py-1 bg-emerald-500/90 backdrop-blur-sm text-white text-xs font-semibold rounded-full"
+        >Unlocked</span>
+        <span
+          *ngIf="!item.unlocked"
+          class="px-2.5 py-1 bg-black/60 backdrop-blur-sm text-white/50 text-xs font-semibold rounded-full border border-white/10"
+        >Locked</span>
+      </div>
     </div>
 
     <!-- Details -->
-    <div class="p-6">
-      <h2 class="text-xl font-bold text-white mb-1">{{ item.name }}</h2>
-      <span class="inline-block px-2 py-0.5 bg-gray-700 text-gray-300 text-xs rounded mb-4">
-        {{ item.category }}
-      </span>
-
-      <div class="space-y-3">
-        <div class="flex justify-between items-center py-2 border-b border-gray-700">
-          <span class="text-gray-400 text-sm">XP Required</span>
-          <span class="text-orange-400 font-semibold">{{ item.xp | number }}</span>
-        </div>
-
-        <div *ngIf="item.unlocked" class="flex justify-between items-center py-2">
-          <span class="text-gray-400 text-sm">Status</span>
-          <span class="text-green-400 font-semibold flex items-center gap-1">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-            </svg>
-            Unlocked
+    <div class="p-5">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-lg font-semibold text-white tracking-tight">{{ item.name }}</h2>
+          <span class="inline-block px-2.5 py-0.5 bg-white/8 text-white/40 text-xs rounded-full border border-white/10 mt-1">
+            {{ item.category }}
           </span>
         </div>
-
-        <div *ngIf="!item.unlocked && item.xpToGo !== undefined" class="flex justify-between items-center py-2">
-          <span class="text-gray-400 text-sm">XP to Unlock</span>
-          <span class="text-red-400 font-semibold">{{ item.xpToGo | number }} XP to go</span>
+        <div class="text-right flex-shrink-0">
+          <p class="text-orange-400 font-semibold">{{ item.xp | number }}</p>
+          <p class="text-white/30 text-xs mt-0.5">XP required</p>
         </div>
+      </div>
+
+      <!-- Progress / Status -->
+      <div *ngIf="!item.unlocked && item.xpToGo !== undefined" class="bg-white/5 rounded-2xl p-3.5 border border-white/8">
+        <div class="flex justify-between text-xs text-white/40 mb-2">
+          <span>Progress</span>
+          <span>{{ item.xpToGo | number }} XP to go</span>
+        </div>
+        <div class="h-1.5 bg-white/8 rounded-full overflow-hidden">
+          <div
+            class="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full"
+            [style.width.%]="100 - (item.xpToGo / item.xp * 100)"
+          ></div>
+        </div>
+      </div>
+
+      <div *ngIf="item.unlocked" class="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-3.5 flex items-center gap-3">
+        <div class="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+          </svg>
+        </div>
+        <p class="text-emerald-400 text-sm font-medium">You've unlocked this item</p>
       </div>
     </div>
   </div>

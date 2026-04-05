@@ -1,16 +1,17 @@
-<div class="min-h-screen bg-gray-900 text-white">
+<div class="min-h-screen bg-black text-white">
+
   <!-- Header -->
-  <header class="bg-gray-800 border-b border-gray-700 sticky top-0 z-10 shadow-lg">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+  <header class="glass-dark sticky top-0 z-10">
+    <div class="max-w-4xl mx-auto px-5 py-3.5 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center">
-          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+        <div class="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-md shadow-orange-500/20">
+          <svg class="w-4.5 h-4.5 text-white" fill="currentColor" viewBox="0 0 24 24" style="width:18px;height:18px">
             <path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/>
           </svg>
         </div>
         <div>
-          <h1 class="text-lg font-bold leading-none">Zwift XP Tracker</h1>
-          <p *ngIf="authState().profile" class="text-xs text-gray-400 leading-none mt-0.5">
+          <h1 class="text-sm font-semibold leading-none tracking-tight">Zwift XP</h1>
+          <p *ngIf="authState().profile" class="text-xs text-white/40 leading-none mt-0.5">
             {{ authState().profile!.firstName }} {{ authState().profile!.lastName }}
           </p>
         </div>
@@ -20,65 +21,62 @@
         <button
           (click)="sync()"
           [disabled]="authState().isLoading"
-          class="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition flex items-center gap-1.5"
+          class="px-3.5 py-1.5 bg-orange-500 hover:bg-orange-400 active:bg-orange-600 disabled:opacity-40 text-white text-xs font-semibold rounded-full transition-all flex items-center gap-1.5 shadow shadow-orange-500/20"
         >
           <svg
             [class.animate-spin]="authState().isLoading"
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+            class="w-3.5 h-3.5"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
-          Sync XP
+          Sync
         </button>
 
         <button
           (click)="logout()"
-          class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium rounded-lg transition"
+          class="px-3.5 py-1.5 bg-white/8 hover:bg-white/12 text-white/60 hover:text-white/80 text-xs font-medium rounded-full transition-all border border-white/10"
         >
-          Logout
+          Sign out
         </button>
       </div>
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+  <div class="max-w-4xl mx-auto px-5 py-6 space-y-5">
+
     <!-- Error -->
-    <div *ngIf="authState().error" class="bg-red-900/50 border border-red-500 text-red-300 rounded-lg p-3 text-sm">
+    <div *ngIf="authState().error" class="bg-red-500/10 border border-red-500/30 text-red-400 rounded-2xl p-4 text-sm">
       {{ authState().error }}
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
-        <p class="text-gray-400 text-xs uppercase tracking-wide mb-1">Current XP</p>
-        <p class="text-2xl font-bold text-orange-400">{{ formatXP(authState().currentXP) }}</p>
-        <p *ngIf="authState().lastSynced" class="text-xs text-gray-500 mt-1">
-          Level {{ authState().level }}
-        </p>
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="glass rounded-2xl p-4">
+        <p class="text-white/40 text-xs font-medium tracking-wide mb-2">Current XP</p>
+        <p class="text-2xl font-semibold text-orange-400 tracking-tight">{{ formatXP(authState().currentXP) }}</p>
+        <p *ngIf="authState().lastSynced" class="text-xs text-white/30 mt-1">Level {{ authState().level }}</p>
       </div>
 
-      <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
-        <p class="text-gray-400 text-xs uppercase tracking-wide mb-1">Unlocked</p>
-        <p class="text-2xl font-bold text-green-400">{{ unlockedCount() }}</p>
-        <p class="text-xs text-gray-500 mt-1">of {{ enrichedItems().length }} items</p>
+      <div class="glass rounded-2xl p-4">
+        <p class="text-white/40 text-xs font-medium tracking-wide mb-2">Unlocked</p>
+        <p class="text-2xl font-semibold text-emerald-400 tracking-tight">{{ unlockedCount() }}</p>
+        <p class="text-xs text-white/30 mt-1">of {{ enrichedItems().length }}</p>
       </div>
 
-      <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
-        <p class="text-gray-400 text-xs uppercase tracking-wide mb-1">Locked</p>
-        <p class="text-2xl font-bold text-red-400">{{ lockedCount() }}</p>
-        <p class="text-xs text-gray-500 mt-1">items remaining</p>
+      <div class="glass rounded-2xl p-4">
+        <p class="text-white/40 text-xs font-medium tracking-wide mb-2">Remaining</p>
+        <p class="text-2xl font-semibold text-white/80 tracking-tight">{{ lockedCount() }}</p>
+        <p class="text-xs text-white/30 mt-1">to unlock</p>
       </div>
 
-      <div class="bg-gray-800 rounded-xl p-4 border border-gray-700">
-        <p class="text-gray-400 text-xs uppercase tracking-wide mb-1">Progress</p>
-        <p class="text-2xl font-bold text-blue-400">{{ progressPercent() }}%</p>
-        <div class="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+      <div class="glass rounded-2xl p-4">
+        <p class="text-white/40 text-xs font-medium tracking-wide mb-2">Progress</p>
+        <p class="text-2xl font-semibold text-white/80 tracking-tight">{{ progressPercent() }}%</p>
+        <div class="mt-2.5 h-1 bg-white/10 rounded-full overflow-hidden">
           <div
-            class="h-full bg-blue-400 rounded-full transition-all duration-500"
+            class="h-full bg-gradient-to-r from-orange-500 to-orange-400 rounded-full transition-all duration-700"
             [style.width.%]="progressPercent()"
           ></div>
         </div>
@@ -86,10 +84,10 @@
     </div>
 
     <!-- Next Unlock -->
-    <div *ngIf="nextUnlock() as next" class="bg-gradient-to-r from-orange-900/40 to-yellow-900/40 border border-orange-500/30 rounded-xl p-4">
-      <p class="text-orange-400 text-xs font-semibold uppercase tracking-wide mb-2">Next Unlock</p>
+    <div *ngIf="nextUnlock() as next" class="glass rounded-2xl p-4 border border-orange-500/15">
+      <p class="text-orange-400/80 text-xs font-semibold uppercase tracking-widest mb-3">Next Unlock</p>
       <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
+        <div class="w-14 h-14 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 border border-white/8">
           <img
             *ngIf="next.imageUrl"
             [src]="next.imageUrl"
@@ -99,67 +97,74 @@
           />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-semibold text-white truncate">{{ next.name }}</p>
-          <p class="text-sm text-gray-400">{{ next.category }}</p>
+          <p class="font-semibold text-white truncate tracking-tight">{{ next.name }}</p>
+          <p class="text-sm text-white/40 mt-0.5">{{ next.category }}</p>
+          <!-- progress bar -->
+          <div class="mt-2 h-1 bg-white/8 rounded-full overflow-hidden">
+            <div
+              class="h-full bg-orange-500/60 rounded-full"
+              [style.width.%]="100 - ((next.xpToGo || 0) / next.xp * 100)"
+            ></div>
+          </div>
         </div>
         <div class="text-right flex-shrink-0">
-          <p class="text-orange-400 font-bold">{{ formatXP(next.xp) }} XP</p>
-          <p class="text-sm text-gray-400">{{ formatXP(next.xpToGo || 0) }} to go</p>
+          <p class="text-orange-400 font-semibold text-sm">{{ formatXP(next.xp) }}</p>
+          <p class="text-xs text-white/35 mt-0.5">{{ formatXP(next.xpToGo || 0) }} to go</p>
         </div>
       </div>
     </div>
 
-    <!-- Controls: Filter + View Toggle -->
+    <!-- Controls -->
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <!-- Filter Buttons -->
-      <div class="flex bg-gray-800 rounded-lg p-1 gap-1">
+      <!-- Segmented Filter -->
+      <div class="flex bg-white/6 rounded-full p-1 gap-0.5 border border-white/8">
         <button
           (click)="setFilter('all')"
           [class]="filterMode() === 'all'
-            ? 'px-4 py-1.5 bg-orange-500 text-white text-sm font-medium rounded-md transition'
-            : 'px-4 py-1.5 text-gray-400 hover:text-white text-sm font-medium rounded-md transition'"
+            ? 'px-4 py-1.5 bg-white/15 text-white text-xs font-semibold rounded-full transition-all'
+            : 'px-4 py-1.5 text-white/45 hover:text-white/70 text-xs font-medium rounded-full transition-all'"
         >
-          All ({{ enrichedItems().length }})
+          All {{ enrichedItems().length }}
         </button>
         <button
           (click)="setFilter('unlocked')"
           [class]="filterMode() === 'unlocked'
-            ? 'px-4 py-1.5 bg-orange-500 text-white text-sm font-medium rounded-md transition'
-            : 'px-4 py-1.5 text-gray-400 hover:text-white text-sm font-medium rounded-md transition'"
+            ? 'px-4 py-1.5 bg-white/15 text-white text-xs font-semibold rounded-full transition-all'
+            : 'px-4 py-1.5 text-white/45 hover:text-white/70 text-xs font-medium rounded-full transition-all'"
         >
-          Unlocked ({{ unlockedCount() }})
+          Unlocked {{ unlockedCount() }}
         </button>
         <button
           (click)="setFilter('locked')"
           [class]="filterMode() === 'locked'
-            ? 'px-4 py-1.5 bg-orange-500 text-white text-sm font-medium rounded-md transition'
-            : 'px-4 py-1.5 text-gray-400 hover:text-white text-sm font-medium rounded-md transition'"
+            ? 'px-4 py-1.5 bg-white/15 text-white text-xs font-semibold rounded-full transition-all'
+            : 'px-4 py-1.5 text-white/45 hover:text-white/70 text-xs font-medium rounded-full transition-all'"
         >
-          Locked ({{ lockedCount() }})
+          Locked {{ lockedCount() }}
         </button>
       </div>
 
       <!-- View Toggle -->
-      <div class="flex bg-gray-800 rounded-lg p-1 gap-1">
+      <div class="flex bg-white/6 rounded-full p-1 gap-0.5 border border-white/8">
         <button
           (click)="setView('list')"
           [class]="viewMode() === 'list'
-            ? 'p-2 bg-orange-500 text-white rounded-md transition'
-            : 'p-2 text-gray-400 hover:text-white rounded-md transition'"
+            ? 'p-2 bg-white/15 text-white rounded-full transition-all'
+            : 'p-2 text-white/40 hover:text-white/70 rounded-full transition-all'"
           title="List view"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
           </svg>
         </button>
         <button
           (click)="setView('grid')"
           [class]="viewMode() === 'grid'
-            ? 'p-2 bg-orange-500 text-white rounded-md transition'
-            : 'p-2 text-gray-400 hover:text-white rounded-md transition'"
+            ? 'p-2 bg-white/15 text-white rounded-full transition-all'
+            : 'p-2 text-white/40 hover:text-white/70 rounded-full transition-all'"
           title="Grid view"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
           </svg>
         </button>
@@ -167,14 +172,13 @@
     </div>
 
     <!-- List View -->
-    <div *ngIf="viewMode() === 'list'" class="space-y-2">
+    <div *ngIf="viewMode() === 'list'" class="space-y-1.5">
       <div
         *ngFor="let item of filteredItems(); trackBy: trackByName"
         (click)="selectItem(item)"
-        class="bg-gray-800 hover:bg-gray-750 border border-gray-700 rounded-xl p-3 flex items-center gap-4 cursor-pointer transition hover:border-orange-500/50 group"
+        class="glass rounded-2xl px-4 py-3 flex items-center gap-4 cursor-pointer transition-all hover:bg-white/10 group"
       >
-        <!-- Thumbnail -->
-        <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-700 flex-shrink-0">
+        <div class="w-11 h-11 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
           <img
             *ngIf="item.imageUrl"
             [src]="item.imageUrl"
@@ -184,35 +188,31 @@
           />
         </div>
 
-        <!-- Info -->
         <div class="flex-1 min-w-0">
-          <p class="font-medium text-white truncate group-hover:text-orange-400 transition">{{ item.name }}</p>
-          <p class="text-sm text-gray-400">{{ item.category }}</p>
+          <p class="font-medium text-white/90 truncate text-sm tracking-tight group-hover:text-white transition">{{ item.name }}</p>
+          <p class="text-xs text-white/35 mt-0.5">{{ item.category }}</p>
         </div>
 
-        <!-- XP + Status -->
         <div class="text-right flex-shrink-0">
-          <p class="font-semibold text-orange-400">{{ formatXP(item.xp) }} XP</p>
-          <p *ngIf="item.unlocked" class="text-xs text-green-400 font-medium">Unlocked</p>
-          <p *ngIf="!item.unlocked" class="text-xs text-gray-500">{{ formatXP(item.xpToGo || 0) }} to go</p>
+          <p class="text-sm font-semibold text-orange-400/90">{{ formatXP(item.xp) }}</p>
+          <p *ngIf="item.unlocked" class="text-xs text-emerald-400/80 mt-0.5">Unlocked</p>
+          <p *ngIf="!item.unlocked" class="text-xs text-white/30 mt-0.5">{{ formatXP(item.xpToGo || 0) }} to go</p>
         </div>
 
-        <!-- Arrow -->
-        <svg class="w-4 h-4 text-gray-600 group-hover:text-orange-400 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        <svg class="w-3.5 h-3.5 text-white/20 group-hover:text-white/40 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
         </svg>
       </div>
     </div>
 
     <!-- Grid View -->
-    <div *ngIf="viewMode() === 'grid'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div *ngIf="viewMode() === 'grid'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
       <div
         *ngFor="let item of filteredItems(); trackBy: trackByName"
         (click)="selectItem(item)"
-        class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden cursor-pointer transition hover:border-orange-500/50 hover:shadow-lg hover:shadow-orange-900/20 group"
+        class="glass rounded-2xl overflow-hidden cursor-pointer transition-all hover:bg-white/10 hover:scale-[1.02] group"
       >
-        <!-- Image -->
-        <div class="relative h-32 bg-gray-700 flex items-center justify-center overflow-hidden">
+        <div class="relative h-28 bg-white/5 flex items-center justify-center overflow-hidden">
           <img
             *ngIf="item.imageUrl"
             [src]="item.imageUrl"
@@ -220,31 +220,36 @@
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             (error)="$any($event.target).style.display='none'"
           />
-          <svg *ngIf="!item.imageUrl" class="w-10 h-10 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+          <svg *ngIf="!item.imageUrl" class="w-8 h-8 text-white/10" fill="currentColor" viewBox="0 0 24 24">
             <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
           </svg>
 
-          <!-- Overlay status -->
-          <div *ngIf="item.unlocked" class="absolute inset-0 bg-green-500/10 flex items-end justify-end p-1.5">
-            <span class="bg-green-500 text-white text-xs px-1.5 py-0.5 rounded font-medium">✓</span>
+          <!-- Locked overlay -->
+          <div *ngIf="!item.unlocked" class="absolute inset-0 bg-black/50"></div>
+
+          <!-- Unlocked badge -->
+          <div *ngIf="item.unlocked" class="absolute top-2 right-2">
+            <div class="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow">
+              <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+            </div>
           </div>
-          <div *ngIf="!item.unlocked" class="absolute inset-0 bg-black/40"></div>
         </div>
 
-        <!-- Card info -->
         <div class="p-2.5">
-          <p class="text-xs font-medium text-white truncate">{{ item.name }}</p>
-          <p class="text-xs text-gray-500 mt-0.5">{{ item.category }}</p>
-          <p class="text-xs font-semibold mt-1" [class]="item.unlocked ? 'text-green-400' : 'text-orange-400'">
+          <p class="text-xs font-semibold text-white/80 truncate tracking-tight">{{ item.name }}</p>
+          <p class="text-xs text-white/30 mt-0.5">{{ item.category }}</p>
+          <p class="text-xs font-semibold mt-1.5" [class]="item.unlocked ? 'text-emerald-400/80' : 'text-orange-400/70'">
             {{ formatXP(item.xp) }} XP
           </p>
         </div>
       </div>
     </div>
 
-    <!-- Last synced footer -->
-    <p *ngIf="authState().lastSynced" class="text-center text-xs text-gray-600 pb-4">
-      Last synced: {{ authState().lastSynced | date:'medium' }}
+    <!-- Footer -->
+    <p *ngIf="authState().lastSynced" class="text-center text-xs text-white/20 pb-6">
+      Synced {{ authState().lastSynced | date:'MMM d, h:mm a' }}
     </p>
   </div>
 </div>

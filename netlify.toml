@@ -3,7 +3,7 @@
 [build]
   command = "npm run build"
   functions = "netlify/functions"
-  publish = "build"
+  publish = "dist/zwift-xp-tracker/browser"
 
 # Redirect API calls to Netlify Functions
 [[redirects]]
@@ -27,6 +27,7 @@
 # Function configuration
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["@codingwithspike/zwift-api-wrapper"]
 
 # Headers for API endpoints
 [[headers]]

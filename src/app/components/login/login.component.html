@@ -1,29 +1,32 @@
-<div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-  <div class="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-8">
+<div class="min-h-screen bg-black flex items-center justify-center p-4">
 
-    <!-- Logo / Title -->
+  <!-- Ambient glow -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <div class="glass rounded-3xl shadow-2xl w-full max-w-sm p-8 relative">
+
+    <!-- Logo -->
     <div class="text-center mb-8">
-      <div class="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+      <div class="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-orange-500/30">
         <svg class="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 24 24">
           <path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/>
         </svg>
       </div>
-      <h1 class="text-3xl font-bold text-white">Zwift XP Tracker</h1>
-      <p class="text-gray-400 mt-2">Sign in with your Zwift credentials</p>
+      <h1 class="text-2xl font-semibold text-white tracking-tight">Zwift XP Tracker</h1>
+      <p class="text-sm text-white/50 mt-1.5">Sign in with your Zwift account</p>
     </div>
 
     <ng-container *ngIf="state$ | async as state">
-      <!-- Error Message -->
-      <div *ngIf="state.error" class="mb-4 bg-red-900/50 border border-red-500 text-red-300 rounded-lg p-3 text-sm">
+      <!-- Error -->
+      <div *ngIf="state.error" class="mb-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-2xl p-3.5 text-sm">
         {{ state.error }}
       </div>
 
-      <!-- Login Form -->
-      <form (ngSubmit)="onSubmit()" class="space-y-5">
+      <!-- Form -->
+      <form (ngSubmit)="onSubmit()" class="space-y-3">
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-300 mb-1">
-            Zwift Email
-          </label>
           <input
             id="email"
             type="email"
@@ -31,57 +34,52 @@
             name="email"
             required
             autocomplete="email"
-            placeholder="you@example.com"
-            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
+            placeholder="Zwift email"
+            class="w-full px-4 py-3.5 bg-white/8 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-orange-500/60 focus:border-orange-500/40 transition text-sm"
           />
         </div>
 
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-300 mb-1">
-            Zwift Password
-          </label>
-          <div class="relative">
-            <input
-              id="password"
-              [type]="showPassword ? 'text' : 'password'"
-              [(ngModel)]="password"
-              name="password"
-              required
-              autocomplete="current-password"
-              placeholder="••••••••"
-              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition pr-12"
-            />
-            <button
-              type="button"
-              (click)="togglePassword()"
-              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition"
-            >
-              <svg *ngIf="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-              </svg>
-              <svg *ngIf="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
-              </svg>
-            </button>
-          </div>
+        <div class="relative">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            [(ngModel)]="password"
+            name="password"
+            required
+            autocomplete="current-password"
+            placeholder="Password"
+            class="w-full px-4 py-3.5 bg-white/8 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-orange-500/60 focus:border-orange-500/40 transition text-sm pr-12"
+          />
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition"
+          >
+            <svg *ngIf="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <svg *ngIf="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+            </svg>
+          </button>
         </div>
 
         <button
           type="submit"
           [disabled]="state.isLoading || !email || !password"
-          class="w-full py-3 px-4 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-500/50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition flex items-center justify-center gap-2"
+          class="w-full py-3.5 px-4 bg-orange-500 hover:bg-orange-400 active:bg-orange-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all duration-150 flex items-center justify-center gap-2 text-sm shadow-lg shadow-orange-500/20 mt-4"
         >
-          <svg *ngIf="state.isLoading" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+          <svg *ngIf="state.isLoading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
           </svg>
-          {{ state.isLoading ? 'Signing In...' : 'Sign In with Zwift' }}
+          {{ state.isLoading ? 'Signing in…' : 'Sign In' }}
         </button>
       </form>
 
-      <p class="text-center text-gray-500 text-xs mt-6">
-        Your credentials are used only to authenticate with Zwift and are stored locally in your browser.
+      <p class="text-center text-white/25 text-xs mt-6 leading-relaxed">
+        Credentials are stored locally in your browser and used only to sync with Zwift.
       </p>
     </ng-container>
   </div>
