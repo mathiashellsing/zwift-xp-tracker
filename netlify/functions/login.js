@@ -86,6 +86,7 @@ export const handler = async (event, context) => {
       };
     }
 
+    // achievementLevel is encoded in hundredths: 3751 means level 37.
     // Extract XP and level from profile using correct Zwift field names
     let xp = 0;
     let level = 0;
@@ -93,7 +94,7 @@ export const handler = async (event, context) => {
     if (profile) {
       // Zwift uses "totalExperiencePoints" for cycling XP and "achievementLevel" for level
       xp = profile.totalExperiencePoints || 0;
-      level = profile.achievementLevel || 0;
+      level = Math.floor((profile.achievementLevel || 0) / 100);
       console.log('[LOGIN] Extracted XP:', xp, 'Level:', level);
     }
 
