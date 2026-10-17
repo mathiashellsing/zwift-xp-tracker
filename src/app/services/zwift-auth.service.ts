@@ -49,7 +49,9 @@ export class ZwiftAuthService {
       const firstName = localStorage.getItem(STORAGE_KEYS.FIRST_NAME) ?? '';
       const lastName = localStorage.getItem(STORAGE_KEYS.LAST_NAME) ?? '';
       const xp = parseInt(localStorage.getItem(STORAGE_KEYS.XP) ?? '0', 10);
-      const level = parseInt(localStorage.getItem(STORAGE_KEYS.LEVEL) ?? '0', 10);
+      const storedLevel = parseInt(localStorage.getItem(STORAGE_KEYS.LEVEL) ?? '0', 10);
+      // Migrate raw achievementLevel values cached before level decoding was fixed.
+      const level = storedLevel > 100 ? Math.floor(storedLevel / 100) : storedLevel;
       const lastSynced = localStorage.getItem(STORAGE_KEYS.LAST_SYNCED) ?? '';
 
       if (email && password && athleteId) {
@@ -112,7 +114,7 @@ export class ZwiftAuthService {
               ? { firstName: res.profile.firstName, lastName: res.profile.lastName }
               : null,
             currentXP: res.xp ?? res.profile?.totalExperiencePoints ?? 0,
-            level: res.level ?? res.profile?.achievementLevel ?? 0,
+            level: res.level ?? Math.floor((res.profile?.achievementLevel ?? 0) / 100),
             lastSynced: new Date().toISOString(),
             isLoading: false,
             error: null,
