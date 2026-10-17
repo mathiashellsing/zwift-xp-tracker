@@ -103,7 +103,16 @@
     </div>
 
     <!-- Next Unlock -->
-    <div *ngIf="nextUnlock() as next" class="glass rounded-2xl p-4 border border-orange-500/15">
+    <div
+      *ngIf="nextUnlock() as next"
+      role="button"
+      tabindex="0"
+      [attr.aria-label]="'View ' + next.name + ' details and image'"
+      (click)="selectItem(next)"
+      (keydown.enter)="selectItem(next)"
+      (keydown.space)="$event.preventDefault(); selectItem(next)"
+      class="glass rounded-2xl p-4 border border-orange-500/15 cursor-pointer transition-all hover:bg-ink/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-page"
+    >
       <p class="text-accent text-xs font-semibold uppercase tracking-widest mb-3">Next Unlock</p>
       <div class="flex items-center gap-4">
         <div class="w-14 h-14 rounded-xl overflow-hidden bg-ink/5 flex-shrink-0 border border-ink/8">
