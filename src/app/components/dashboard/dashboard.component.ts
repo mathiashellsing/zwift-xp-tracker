@@ -24,6 +24,11 @@ export class DashboardComponent {
     initialValue: this.authService.state,
   });
 
+  levelProgress = computed(() => {
+    const level = this.authState().level;
+    return Number.isFinite(level) ? Math.min(100, Math.max(0, level)) : 0;
+  });
+
   filterMode = signal<FilterMode>('all');
   viewMode = signal<ViewMode>('list');
   selectedItem = signal<Unlockable | null>(null);
