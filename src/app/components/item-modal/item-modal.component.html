@@ -2,15 +2,15 @@
   class="fixed inset-0 bg-black/70 backdrop-blur-xl flex items-center justify-center z-50 p-4"
   (click)="onBackdropClick($event)"
 >
-  <div class="glass rounded-3xl shadow-2xl w-full max-w-sm max-h-[calc(100dvh-2rem)] overflow-y-auto">
+  <div class="glass rounded-3xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto">
 
     <!-- Image -->
-    <div class="relative bg-ink/5 h-52 flex items-center justify-center overflow-hidden">
+    <div class="relative bg-ink/5 aspect-square w-full flex items-center justify-center overflow-hidden">
       <img
         *ngIf="item.imageUrl"
         [src]="item.imageUrl"
         [alt]="item.name"
-        class="h-full w-full object-contain"
+        class="absolute inset-0 h-full w-full object-contain"
         (error)="$any($event.target).style.display='none'"
       />
       <svg *ngIf="!item.imageUrl" class="w-14 h-14 text-ink/10" fill="currentColor" viewBox="0 0 24 24">
