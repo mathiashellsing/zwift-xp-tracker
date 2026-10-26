@@ -1,5 +1,4 @@
 export const TRON_TARGET = 50000;
-export const EVEREST_TARGET = 8848;
 
 export interface TronCheckpoint {
   meters: number;
@@ -23,7 +22,6 @@ export function calculateTronProgress(checkpoint: TronCheckpoint, lifetimeClimbe
     meters: Math.floor(meters),
     remaining: Math.max(0, Math.ceil(TRON_TARGET - meters)),
     percent: Math.min(100, Math.floor(meters / TRON_TARGET * 1000) / 10),
-    everestPercent: Math.min(100, meters / EVEREST_TARGET * 100),
     current,
   };
 }
