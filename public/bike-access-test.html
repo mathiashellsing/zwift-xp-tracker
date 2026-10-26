@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Testa cykeluppgraderingar · Zwift XP</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { margin: 0; padding: 24px; }
+    main { max-width: 480px; margin: 8vh auto; }
+    h1 { font-size: 24px; } p { line-height: 1.6; }
+    button { background: #c2410c; color: white; border: 0; border-radius: 12px; padding: 14px 20px; font: inherit; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: wait; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 16px; border: 1px solid #8886; border-radius: 12px; }
+    a { color: light-dark(#9a3412, #fb923c); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Cykeluppgraderingar</h1>
+  <p>Testa om Zwift låter oss läsa uppgraderingsstatus med samma inloggning som du använder i appen. Testet ändrar inget på ditt Zwift-konto.</p>
+  <p id="session"></p>
+  <button id="test" type="button">Testa åtkomst</button>
+  <p id="result" role="status" aria-live="polite"></p>
+  <pre id="report" hidden></pre>
+  <p><a href="/">Tillbaka till Zwift XP</a></p>
+</main>
+<script>
+  const test = document.getElementById('test');
+  const result = document.getElementById('result');
+  const report = document.getElementById('report');
+  function credentials() {
+    try {
+      return { email: localStorage.getItem('zwift-session.email'),
+        password: localStorage.getItem('zwift-session.password') };
+    } catch { return {}; }
+  }
+  const saved = credentials();
+  if (!saved.email || !saved.password) {
+    test.disabled = true;
+    document.getElementById('session').textContent =
+      'Logga först in på startsidan i samma webbläsare och öppna sedan den här testsidan igen.';
+  }
+  test.addEventListener('click', async () => {
+    test.disabled = true;
+    report.hidden = true;
+    result.textContent = 'Testar inloggning och läsåtkomst…';
+    try {
+      const response = await fetch('/.netlify/functions/bike-access-test', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials()), cache: 'no-store',
+      });
+      const data = await response.json();
+      const messages = {
+        forbidden: 'Zwift-inloggningen fungerar, men uppgraderingsdatan nekas (HTTP 403).',
+        unauthorized: 'Zwift godtar inte inloggningstoken för den här datan (HTTP 401).',
+        received_unverified: 'Zwift returnerade data! Innehållet behöver avkodas innan vi vet om det innehåller cyklarnas status.',
+        empty: 'Anropet lyckades men svaret var tomt. Det bekräftar inte att någon uppgraderingsdata finns.',
+        login_failed: 'Inloggningen misslyckades. Logga in på startsidan igen och försök på nytt.',
+        missing_token: 'Inloggningen returnerade ingen användbar token.',
+        network_error: 'Anropet kunde inte slutföras. Det säger inget säkert om åtkomsten.',
+        upstream_error: 'Zwift svarade med ett fel. Se resultatet nedan.',
+      };
+      result.textContent = messages[data.outcome] || 'Testet kunde inte slutföras.';
+      report.textContent = JSON.stringify({
+        test: 'bike-progress-read-access',
+        testedAt: new Date().toISOString(),
+        functionStatus: response.status,
+        ...data,
+      }, null, 2);
+      report.hidden = false;
+    } catch {
+      result.textContent = 'Testsidan kunde inte nå servern. Försök igen.';
+    } finally { test.disabled = false; }
+  });
+</script>
+</body>
+</html>
