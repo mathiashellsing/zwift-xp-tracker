@@ -1,4 +1,5 @@
 import { ZwiftAPI } from '@codingwithspike/zwift-api-wrapper';
+import { decodeBikeProgress } from './utils/bikeProgress.js';
 
 const reply = (statusCode, data) => ({
   statusCode,
@@ -6,7 +7,7 @@ const reply = (statusCode, data) => ({
   body: JSON.stringify(data),
 });
 
-// Read-only probe. Credentials/tokens and upstream response bodies are never logged or returned.
+// Read-only probe. Return only known bike fields; never log credentials, tokens or raw bodies.
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') return reply(405, { error: 'Method not allowed' });
   let input;
@@ -43,12 +44,23 @@ export const handler = async (event) => {
       },
     );
     const data = await response.arrayBuffer();
+    let bikes;
+    let decodedOutcome;
+    if (response.ok && data.byteLength) {
+      try {
+        bikes = decodeBikeProgress(data);
+        decodedOutcome = bikes.length ? 'decoded' : 'no_bike_records';
+      } catch {
+        decodedOutcome = 'decode_failed';
+      }
+    }
     return reply(200, {
       upstreamStatus: response.status,
       outcome: response.status === 403 ? 'forbidden'
         : response.status === 401 ? 'unauthorized'
-        : response.ok ? (data.byteLength ? 'received_unverified' : 'empty')
+        : response.ok ? (data.byteLength ? decodedOutcome : 'empty')
         : 'upstream_error',
+      ...(bikes ? { bikeCount: bikes.length, bikes } : {}),
       bytes: data.byteLength,
       contentType: response.headers.get('content-type') || '',
     });

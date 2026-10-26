@@ -55,6 +55,9 @@
       const messages = {
         forbidden: 'Zwift-inloggningen fungerar, men uppgraderingsdatan nekas (HTTP 403).',
         unauthorized: 'Zwift godtar inte inloggningstoken för den här datan (HTTP 401).',
+        decoded: 'Cykelstatus kunde avkodas! Se nivå och framsteg per cykel i resultatet nedan.',
+        no_bike_records: 'Anropet lyckades, men inga cykelposter hittades i svaret.',
+        decode_failed: 'Zwift returnerade data, men den matchar inte det väntade Protobuf-formatet. Det behöver undersökas vidare.',
         received_unverified: 'Zwift returnerade data! Innehållet behöver avkodas innan vi vet om det innehåller cyklarnas status.',
         empty: 'Anropet lyckades men svaret var tomt. Det bekräftar inte att någon uppgraderingsdata finns.',
         login_failed: 'Inloggningen misslyckades. Logga in på startsidan igen och försök på nytt.',
