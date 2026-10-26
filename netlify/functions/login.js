@@ -113,6 +113,10 @@ export const handler = async (event, context) => {
         } : null,
         xp,
         level,
+        // Lifetime cycling ascent; this is not Everest challenge progress.
+        totalClimbed: typeof profile.totalDistanceClimbed === 'number' &&
+          Number.isFinite(profile.totalDistanceClimbed) && profile.totalDistanceClimbed >= 0
+          ? profile.totalDistanceClimbed : null,
         // Return credentials for client to use in subsequent requests
         // These will be stored in localStorage on the client
         credentials: {

@@ -88,6 +88,10 @@ export const handler = async (event, context) => {
         success: true,
         xp,
         level,
+        // Lifetime cycling ascent; this is not Everest challenge progress.
+        totalClimbed: typeof profile.totalDistanceClimbed === 'number' &&
+          Number.isFinite(profile.totalDistanceClimbed) && profile.totalDistanceClimbed >= 0
+          ? profile.totalDistanceClimbed : null,
         profile: {
           id: profile.id,
           firstName: profile.firstName,

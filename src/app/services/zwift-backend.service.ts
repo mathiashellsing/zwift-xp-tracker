@@ -63,6 +63,7 @@ export interface LoginResponse {
   };
   xp?: number;
   level?: number;
+  totalClimbed?: number | null;
   error?: string;
 }
 
@@ -70,5 +71,6 @@ export interface SyncResponse {
   success: boolean;
   xp?: number;
   level?: number;
+  totalClimbed?: number | null;
   error?: string;
 }

@@ -12,6 +12,7 @@ const STORAGE_KEYS = {
   LAST_NAME: 'zwift-session.lastName',
   XP: 'zwift-session.xp',
   LEVEL: 'zwift-session.level',
+  TOTAL_CLIMBED: 'zwift-session.totalClimbed',
   LAST_SYNCED: 'zwift-session.lastSynced',
 };
 
@@ -23,6 +24,7 @@ const DEFAULT_STATE: AuthState = {
   profile: null,
   currentXP: 0,
   level: 0,
+  totalClimbed: null,
   lastSynced: '',
   isLoading: false,
   error: null,
@@ -52,6 +54,9 @@ export class ZwiftAuthService {
       const storedLevel = parseInt(localStorage.getItem(STORAGE_KEYS.LEVEL) ?? '0', 10);
       // Migrate raw achievementLevel values cached before level decoding was fixed.
       const level = storedLevel > 100 ? Math.floor(storedLevel / 100) : storedLevel;
+      const storedClimbed = localStorage.getItem(STORAGE_KEYS.TOTAL_CLIMBED);
+      const parsedClimbed = storedClimbed === null ? NaN : Number(storedClimbed);
+      const totalClimbed = Number.isFinite(parsedClimbed) && parsedClimbed >= 0 ? parsedClimbed : null;
       const lastSynced = localStorage.getItem(STORAGE_KEYS.LAST_SYNCED) ?? '';
 
       if (email && password && athleteId) {
@@ -63,6 +68,7 @@ export class ZwiftAuthService {
           profile: firstName ? { firstName, lastName } : null,
           currentXP: xp,
           level,
+          totalClimbed,
           lastSynced,
           isLoading: false,
           error: null,
@@ -84,6 +90,8 @@ export class ZwiftAuthService {
         localStorage.setItem(STORAGE_KEYS.LAST_NAME, state.profile?.lastName ?? '');
         localStorage.setItem(STORAGE_KEYS.XP, String(state.currentXP));
         localStorage.setItem(STORAGE_KEYS.LEVEL, String(state.level));
+        if (state.totalClimbed === null) localStorage.removeItem(STORAGE_KEYS.TOTAL_CLIMBED);
+        else localStorage.setItem(STORAGE_KEYS.TOTAL_CLIMBED, String(state.totalClimbed));
         localStorage.setItem(STORAGE_KEYS.LAST_SYNCED, state.lastSynced);
       } else {
         Object.values(STORAGE_KEYS).forEach(k => localStorage.removeItem(k));
@@ -115,6 +123,7 @@ export class ZwiftAuthService {
               : null,
             currentXP: res.xp ?? res.profile?.totalExperiencePoints ?? 0,
             level: res.level ?? Math.floor((res.profile?.achievementLevel ?? 0) / 100),
+            totalClimbed: res.totalClimbed ?? null,
             lastSynced: new Date().toISOString(),
             isLoading: false,
             error: null,
@@ -133,7 +142,7 @@ export class ZwiftAuthService {
     });
   }
 
-  sync(): void {
+  sync(onSuccess?: () => void): void {
     const { email, password } = this.state;
     if (!email || !password) return;
 
@@ -145,10 +154,12 @@ export class ZwiftAuthService {
           this.patch({
             currentXP: res.xp ?? this.state.currentXP,
             level: res.level ?? this.state.level,
+            totalClimbed: res.totalClimbed ?? null,
             lastSynced: new Date().toISOString(),
             isLoading: false,
             error: null,
           });
+          onSuccess?.();
         } else {
           this.patch({ isLoading: false, error: res.error ?? 'Sync failed' });
         }
