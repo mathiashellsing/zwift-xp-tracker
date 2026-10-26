@@ -9,6 +9,7 @@ export interface AuthState {
   } | null;
   currentXP: number;
   level: number;
+  totalClimbed: number | null;
   lastSynced: string;
   isLoading: boolean;
   error: string | null;
