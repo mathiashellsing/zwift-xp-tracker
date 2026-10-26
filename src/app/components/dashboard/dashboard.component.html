@@ -107,7 +107,7 @@
       <div class="flex items-start justify-between gap-3">
         <div>
           <h2 id="tron-heading" class="font-semibold text-ink">Road to TRON</h2>
-          <p class="text-xs text-muted mt-1">Everest challenge · 50,000 m goal</p>
+          <p class="text-xs text-muted mt-1">50,000 m goal</p>
         </div>
         <span class="text-xs text-accent bg-orange-500/10 px-2.5 py-1 rounded-full">Estimated</span>
       </div>
@@ -124,28 +124,14 @@
             [style.width.%]="progress.percent"></div>
         </div>
         <p class="text-sm text-secondary mt-2">{{ formatXP(progress.remaining) }} m to go</p>
-        <div class="mt-4">
-          <div class="flex justify-between gap-2 text-xs text-muted">
-            <span>Everest milestone</span><span>8,848 m</span>
-          </div>
-          <div class="mt-1.5 h-1 bg-ink/10 rounded-full overflow-hidden">
-            <div class="h-full bg-orange-500/60 rounded-full" [style.width.%]="progress.everestPercent"></div>
-          </div>
-        </div>
         <p *ngIf="!progress.current" class="text-xs text-accent mt-3">Sync or update your checkpoint to resume tracking.</p>
       </ng-container>
-
-      <p class="text-xs text-muted leading-relaxed mt-4">
-        Set the climbing total shown in your Everest challenge. Sync adds new climbing from your profile.
-        Keep Everest selected in Zwift; update the checkpoint if you switch challenges.
-        Saved on this device.
-      </p>
 
       <button *ngIf="tronCheckpoint() && !tronEditing()" type="button" (click)="editTronCheckpoint()"
         class="mt-3 text-sm text-accent font-medium underline underline-offset-4">Update checkpoint</button>
 
       <form *ngIf="!tronCheckpoint() || tronEditing()" (ngSubmit)="saveTronCheckpoint()" class="mt-4">
-        <label for="tron-meters" class="block text-xs font-medium text-secondary mb-2">Current Everest / TRON climbing (m)</label>
+        <label for="tron-meters" class="block text-xs font-medium text-secondary mb-2">Current TRON climbing (m)</label>
         <div class="flex flex-wrap items-center gap-2">
           <input id="tron-meters" name="tronMeters" type="number" min="0" max="50000" step="1" required
             [(ngModel)]="tronMeters" placeholder="e.g. 12000"
