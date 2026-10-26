@@ -1,4 +1,8 @@
-<div class="min-h-screen bg-page text-ink">
+<div class="min-h-screen bg-page text-ink"
+  appPullToRefresh
+  [refreshDisabled]="authState().isLoading || selectedItem() !== null"
+  (refreshRequested)="sync()"
+  (pullDistanceChange)="pullDistance.set($event)">
 
   <!-- Header -->
   <header class="glass-dark sticky top-0 z-10">
@@ -18,21 +22,14 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <button
-          (click)="sync()"
-          [disabled]="authState().isLoading"
-          class="px-3.5 py-1.5 bg-orange-500 hover:bg-orange-400 active:bg-orange-600 disabled:opacity-40 text-white text-xs font-semibold rounded-full transition-all flex items-center gap-1.5 shadow shadow-orange-500/20"
-        >
-          <svg
-            [class.animate-spin]="authState().isLoading"
-            class="w-3.5 h-3.5"
-            fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          >
+        <span *ngIf="authState().isLoading" role="status"
+          class="flex items-center gap-1.5 text-xs text-accent">
+          <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
-          Sync
-        </button>
+          Updating…
+        </span>
 
         <button
           (click)="logout()"
@@ -44,11 +41,19 @@
     </div>
   </header>
 
+  <div *ngIf="pullDistance() > 0"
+    class="fixed top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none glass rounded-full px-4 py-2 text-xs font-medium text-accent shadow-lg"
+    role="status">
+    {{ pullDistance() >= pullRefreshThreshold ? 'Release to update' : 'Pull to update' }}
+  </div>
+
   <div class="max-w-4xl mx-auto px-5 py-6 space-y-5">
 
     <!-- Error -->
     <div *ngIf="authState().error" class="bg-red-500/10 border border-red-500/30 text-danger rounded-2xl p-4 text-sm">
       {{ authState().error }}
+      <button type="button" (click)="sync()" [disabled]="authState().isLoading"
+        class="ml-2 underline font-semibold disabled:opacity-40">Try again</button>
     </div>
 
     <!-- Stats -->

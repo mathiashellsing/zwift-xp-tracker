@@ -1,6 +1,7 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, HostListener, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PullToRefreshDirective, PULL_REFRESH_THRESHOLD } from '../../directives/pull-to-refresh.directive';
 import { TronCheckpoint, isTronCheckpoint, calculateTronProgress } from '../../models/tron-progress';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ZwiftAuthService } from '../../services/zwift-auth.service';
@@ -15,7 +16,7 @@ type ViewMode = 'list' | 'grid';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ItemModalComponent],
+  imports: [CommonModule, FormsModule, ItemModalComponent, PullToRefreshDirective],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent {
@@ -25,6 +26,21 @@ export class DashboardComponent {
   authState = toSignal(this.authService.state$, {
     initialValue: this.authService.state,
   });
+
+  pullDistance = signal(0);
+  readonly pullRefreshThreshold = PULL_REFRESH_THRESHOLD;
+
+  @HostListener('document:visibilitychange')
+  onVisibilityChange(): void {
+    if (document.visibilityState !== 'visible') return;
+    const lastSynced = Date.parse(this.authState().lastSynced);
+    if (!Number.isFinite(lastSynced) || Date.now() - lastSynced >= 60000) this.sync();
+  }
+
+  @HostListener('window:pageshow', ['$event'])
+  onPageShow(event: PageTransitionEvent): void {
+    if (event.persisted) this.onVisibilityChange();
+  }
 
   levelProgress = computed(() => {
     const level = this.authState().level;

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuthState } from '../models/auth.model';
 import { ZwiftBackendService } from './zwift-backend.service';
@@ -37,7 +37,12 @@ export class ZwiftAuthService {
   private stateSubject = new BehaviorSubject<AuthState>(this.loadFromStorage());
   state$: Observable<AuthState> = this.stateSubject.asObservable();
 
-  constructor(private backend: ZwiftBackendService) {}
+  private syncRequest?: Subscription;
+
+  constructor(private backend: ZwiftBackendService) {
+    // Restored sessions refresh once at startup; a fresh login already fetches the profile.
+    if (this.state.isAuthenticated) this.sync();
+  }
 
   get state(): AuthState {
     return this.stateSubject.value;
@@ -144,11 +149,11 @@ export class ZwiftAuthService {
 
   sync(onSuccess?: () => void): void {
     const { email, password } = this.state;
-    if (!email || !password) return;
+    if (!this.state.isAuthenticated || !email || !password || this.state.isLoading) return;
 
     this.patch({ isLoading: true, error: null });
 
-    this.backend.syncXP(email, password).subscribe({
+    this.syncRequest = this.backend.syncXP(email, password).subscribe({
       next: (res) => {
         if (res.success) {
           this.patch({
@@ -172,6 +177,8 @@ export class ZwiftAuthService {
   }
 
   logout(): void {
+    this.syncRequest?.unsubscribe();
+    this.syncRequest = undefined;
     this.backend.logout().subscribe({ error: () => {} });
     const cleared = { ...DEFAULT_STATE };
     this.stateSubject.next(cleared);

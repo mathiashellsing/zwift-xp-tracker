@@ -34,12 +34,14 @@
   }
 
   html {
+    overscroll-behavior-y: none;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
+    overscroll-behavior-y: none;
     background-color: rgb(var(--page));
     color: rgb(var(--ink));
   }
